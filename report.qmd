@@ -1,0 +1,36 @@
+---
+title: "Calibrating the minimal number of electrofishing operations required to fit EDA"
+author: "DROUINEAU Hilaire"
+format: docx
+editor: source
+execture:
+  echo: false
+bibliography: references.bib
+---
+
+# Introduction
+
+Electrofishing is a non lethal sampling method widely used to collect and monitor fishes in rivers [@bohlin1989]. It allows to monitor various parameters, including biometry (e.g. length, weight), but also to provide estimates of local abundances. Indeed, various estimators have been developed to estimate the density of fishes, such as the widely used Carle and Strubb estimator [@carle1978].
+
+For the European eel, the Eel Density Analysis (EDA) model [@briand2018] uses electrofishing data to estimate overall eel standing stock biomass at the river unit, Eel Management Unit and countries scale. This is a critical step to subsequently estimate silver eel escapement, a key parameter of the Eel Regulation (Council Regulation (EC) No 1100/2007) [@ices2022c]. EDA is similar to a species distribution model [@guisan2000]: it uses local observations of abundance provided by electrofishing data to extrapolate the abundance on all river network reaches based on a set of environmental and anthropogenic covariates. More precisely, the model is based on two generalised additive models (GAM) following a delta approach [@stefansson1996]:
+
+-   a first submodel predicts the probability of presence of eel in a given station, so-called delta model
+-   a second submodel predicts the density provided eels are present, so called gamma-model.
+
+The product of those two submodels provides an estimation of the abundance in each reach of the river network.
+
+The EDA model has been applied in France, Spain and Portugal during the Sudoang Interreg project [@mateo], demonstrating that it was possible to apply this model and to provide consistent escapement indicators over several European countries. Given that electrofishing sampling is widely used and given the flexibility of the model, EDA was considered as a relevant tool by ICES SGIPEE [@ices2010a] and was promoted by the recent WKSMEEL workshop [@ices2023c] as a suitable tool to achieve an harmonized estimate of eel biomass at the EU scale.
+
+However, while electrofishing sampling is widely applied, it is collected through different frameworks (e.g. WFD, DCF, local monitoring) and data are widespread across different databases. Formalizing a minimal level of sampling level and centralizing the collected data would facilitate a future application of EDA (or of an equivalent model). To do so, we carried out an analysis to estimate the minimum number of fishing operations that would be required to estimate total abundance per year and EMU in a country.
+
+# Material and Methods
+To check the minimal number of fishing operations data that would be required to have reliable estimators of biomass per year and EMU, we used the EDA model fitted during the Sudoang project [@mateo] (except that we estimated a trend per EMU instead of a trend per ecoregion, and applied the model to French EMUs "FR_Rhon" "FR_Garo" "FR_Loir" "FR_Adou" "FR_Bret" "FR_Sein" "FR_Arto" only since data were too scarce in other EMUs to estimate reliable EMU specific trends). More precisely, we used the fitted delta and gamma submodels to have an estimation of the abundance per year and EMU in France over the period 1990-2018. Those estimations were used as a reference.
+
+The two submodels were also used to simulate surrogate observations: i.e. the reference models were used to simulate noisy electrofishing observations each year over the period 1990-2018 in a random subset of reaches of the French hydrographic network. For example, the reference delta and gamma submodels were used to simulate eletrofishing data in 20 randomly picked reaches in each EMU each year from 1990-2018, providing a surrogate dataset of `r (2018-1989)*20*7` datapoints (`r 2018-1989` years x 20 electrofishing data x 7 EMUs). EDA was fitted on this surrogate dataset and was used to estimate surrogate estimators of abundance per year and EMU. This surrogate estimators were then compared to the reference estimators to check whether the number of eletrofishing was enough to provide reliable estimations. More precisely, we computed correlation coefficients for each EMU between yearly reference estimations and yearly surrogate estimations.
+
+The operation was carried out with 20, 40, 60, 80 and 100 fishing operations per year and EMU and with a strategy in which fishing operation are carried out using a random sampling design (i.e. reaches in which electrofishing data are simulated are randomly picked) or a stratified sampling based on the Strahler rank [@strahler1957] to account for the diversity of reach types in the network. For each combination of number of fishing operations and sampling strategy, 100 replicates were generated to account for the observation errors.
+
+
+# Results
+
+# Conclusions
