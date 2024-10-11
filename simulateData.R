@@ -1,8 +1,7 @@
 
-ddatawd=modelwd="~/OneDrive_1_23-02-2024/"
-load(file=file.path(ddatawd,"rn_rna.Rdata")) #rn_rna, rn_rnag
+load("rn_rna.Rdata") #rn_rna, rn_rnag
 
-load(paste0(ddatawd,"calibration_dataset_delta_gamma_2020.Rdata"))
+load("calibration_dataset_delta_gamma_2020.Rdata")
 library(mgcv)
 library(dplyr)
 library(gratia)

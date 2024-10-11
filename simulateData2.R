@@ -1,6 +1,4 @@
 
-
-ddatawd=modelwd="~/OneDrive_1_23-02-2024/"
 library(mgcv)
 library(dplyr)
 library(gratia)
