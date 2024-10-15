@@ -1,7 +1,17 @@
 ---
 title: "Calibrating the minimal number of electrofishing operations required to fit EDA"
-author: "DROUINEAU Hilaire"
-format: docx
+author: 
+  - name: DROUINEAU Hilaire
+    affiliations:
+      - name: INRAE, UR EABX, France
+  - name: BRIAND Cédric
+    affiliations:
+      - name: Eaux & Vilaine, France
+filters:
+  - authors-block
+format:
+  docx:
+    reference-doc: report_model.dotx
 editor: source
 execture:
   echo: false
@@ -24,13 +34,63 @@ The EDA model has been applied in France, Spain and Portugal during the Sudoang 
 However, while electrofishing sampling is widely applied, it is collected through different frameworks (e.g. WFD, DCF, local monitoring) and data are widespread across different databases. Formalizing a minimal level of sampling level and centralizing the collected data would facilitate a future application of EDA (or of an equivalent model). To do so, we carried out an analysis to estimate the minimum number of fishing operations that would be required to estimate total abundance per year and EMU in a country.
 
 # Material and Methods
+## Reference EDA model
 To check the minimal number of fishing operations data that would be required to have reliable estimators of biomass per year and EMU, we used the EDA model fitted during the Sudoang project [@mateo] (except that we estimated a trend per EMU instead of a trend per ecoregion, and applied the model to French EMUs "FR_Rhon" "FR_Garo" "FR_Loir" "FR_Adou" "FR_Bret" "FR_Sein" "FR_Arto" only since data were too scarce in other EMUs to estimate reliable EMU specific trends). More precisely, we used the fitted delta and gamma submodels to have an estimation of the abundance per year and EMU in France over the period 1990-2018. Those estimations were used as a reference.
 
-The two submodels were also used to simulate surrogate observations: i.e. the reference models were used to simulate noisy electrofishing observations each year over the period 1990-2018 in a random subset of reaches of the French hydrographic network. For example, the reference delta and gamma submodels were used to simulate eletrofishing data in 20 randomly picked reaches in each EMU each year from 1990-2018, providing a surrogate dataset of `r (2018-1989)*20*7` datapoints (`r 2018-1989` years x 20 electrofishing data x 7 EMUs). EDA was fitted on this surrogate dataset and was used to estimate surrogate estimators of abundance per year and EMU. This surrogate estimators were then compared to the reference estimators to check whether the number of eletrofishing was enough to provide reliable estimations. More precisely, we computed correlation coefficients for each EMU between yearly reference estimations and yearly surrogate estimations.
+
+## Generation of surrogate data
+The two submodels were also used to simulate surrogate observations: i.e. the reference models were used to simulate noisy electrofishing observations each year over the period 1990-2018 in a random subset of reaches of the French hydrographic network. For example, the reference delta and gamma submodels were used to simulate electrofishing data in 20 randomly picked reaches in each EMU each year from 1990-2018, providing a surrogate dataset of `r (2018-1989)*20*7` datapoints (`r 2018-1989` years x 20 electrofishing data x 7 EMUs). EDA was fitted on this surrogate dataset and was used to estimate surrogate estimators of abundance per year and EMU. 
+
+
+
+## Comparison of surrogate estimation and reference estimations
+The surrogate estimators were then compared to the reference estimators to check whether the number of electrofishing was enough to provide reliable estimations. More precisely, we computed correlation coefficients for each EMU between yearly reference estimations and yearly surrogate estimations.
 
 The operation was carried out with 20, 40, 60, 80 and 100 fishing operations per year and EMU and with a strategy in which fishing operation are carried out using a random sampling design (i.e. reaches in which electrofishing data are simulated are randomly picked) or a stratified sampling based on the Strahler rank [@strahler1957] to account for the diversity of reach types in the network. For each combination of number of fishing operations and sampling strategy, 100 replicates were generated to account for the observation errors.
 
 
 # Results
+[@figures] illustrates that whatever the number of fishing operations, EDA fitted on surrogate data provides estimates that are correlated to the reference estimates. However, uncertainty decreases with the number of fishing operations, being almost stable in most cases above 60 electrofishing data. Another aspect is that the stratified sampling as implemented here does not necessarily, or even tends to decrease, the accuracy of the estimates. [@figures] also shows that reliability of estimates are variable among EMUs, with for example estimates in FR-Rhon that are less correlated than estimates in FR-Adou.
+
+```{r figures}
+#| fig-cap: Distribution of correlation coefficients (y-axis) between 100 surrogate estimations and the reference estimations depending on the number of electrofishing data (x-axis), EMUs (panel) and sampling strategy (colors).
+#| fig-height: 6.3
+#| fig-width: 6.3
+#| echo: false
+#| message: false
+#| warning: false
+#| error: false
+load("eda_simulate2.rdata")
+library(ggplot2)
+library(dplyr)
+
+figure <- ggplot(correlations %>%
+                   mutate(f = ifelse(f=="create_sampling_strahler",
+                                     "stratified",
+                                     "random")), 
+                 aes(x = as.factor(nb),
+                     y = cor,
+                     col = f)) +
+  geom_boxplot() +
+  facet_wrap(~emu) +
+  theme_bw() + 
+  ylab("correlation") + 
+  xlab("nb data per year and EMU") + 
+  scale_color_viridis_d("sampling strategy")  +
+  coord_cartesian(ylim = c(0.5, 1))
+ggsave("correlation.png", figure, width=16/2.54, height=16/2.54,dpi=300)
+knitr::include_graphics("correlation.png")
+
+```
 
 # Conclusions
+This exercise aims at estimating the minimal number of electrofishing operation per year and EMU that would be required to ensure that an EDA like model can estimate a reliable trend per EMU. Results show that at least 60 fishing operations per country and and 420 per country would be a relevant minimum threshold, well suited in a variety of EMUs that display heterogeneous hydrographic networks and level of abundance.
+
+At first glance, those figures could seem large. However, as mentioned earlier, electrofishing operations are carried out through a great diversity of monitoring frameworks (e.g. local scientific monitorings, WFD) and that consequently, it does not imply implementing completely new operations. Moreover, this would allows the non-lethal collection of fishes on which biometry data could be collected, that could be used to inform on spatio-temporal patterns in life history traits, an important issue pointed out during the Workshop on the Future of Eel Advice - WKFEA [@ices2021], and question also pointed out during the DIASPARA project. Of course, data on other species could also be collected.
+
+Fitting EDA model, or other model, would allow to one of the critical step of the roadmap detailed during the WKFEA [@ices2021]: achieving a spatial assessment of the species that is needed to subsequently to assess non-fishery impacts (e.g. turbin mortality, habitat fragmentation). This was latter promoted in the recent WKSMEEL workshop as an important way forward [@ices2023c]. This is line with the databases on electrofishing data and eel habitat that will be proposed during the DIASPARA project.
+
+Here, we have simulated surrogate data corresponding to multi-pass electrofishing data (a removal method in which a station is fully fished successively at least twice). Multi-pass method are required to compute absolute estimators of density such as the Carle and Strubb estimator [@carle1978]. Of course, additional data could be used [@mateo] and inform on the temporal trend, but would not provide as much information on the absolute levels of abundance.
+
+# References
+
