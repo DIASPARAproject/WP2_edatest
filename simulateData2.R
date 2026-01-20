@@ -1,11 +1,18 @@
 
+
+ddatawd=modelwd="~/OneDrive_1_23-02-2024/"
 library(mgcv)
 library(dplyr)
 library(gratia)
 
 years=1990:2018
 
-load("eda_simulate.rdata")
+#load("eda_simulate.rdata")
+myfiles <- list.files() 
+myfiles <- myfiles[startsWith(myfiles, "eda_res_")]
+results = do.call(bind_rows,lapply(myfiles, function(f) read.table(f, sep = ";", header=TRUE)))
+
+
 
 nety0 <- network %>%
   mutate(year = min(years),
@@ -50,10 +57,31 @@ biomass_true_state = do.call(bind_rows,lapply(years, function(y){
 
 
 
-correlations <- do.call(bind_rows,lapply(results, function(res){
-  res %>% left_join(biomass_true_state, by = c("emu","year"), suffix(".iter",".true")) %>%
-    group_by(emu,iter,f,nb) %>%
-    summarize(cor = cor(B.x,B.y), .groups = "keep") %>%
-    ungroup()
-}))
-save.image("eda_simulate2.rdata")
+results |>
+  mutate(strategy  = gsub("create_sampling_", "", f)) |>
+  filter(emu %in% c("FR_Loir", "FR_Garo")) |>
+  group_by(emu, nb, year, strategy) %>%
+  summarize(Binf = quantile(B, 0.025),
+            Bsup = quantile(B, 0.975),
+            .groups = "keep") %>%
+  ungroup() |>
+  left_join(biomass_true_state) |>
+  ggplot(aes(x = year,
+             y = B,
+             fill = strategy)) + 
+  geom_ribbon(aes(ymin = Binf, ymax = Bsup), alpha = .21) +
+  geom_point() +
+  facet_grid(emu~nb, scales = "free_y") +
+  scale_y_log10() +
+  theme_bw() +
+  xlab("")
+ggsave("trends.png", width = 16/2.54, height = 16/2.54, dpi = 300)
+
+save(correlations, file = "eda_simulate2.rdata")
+
+
+
+
+results %>% left_join(biomass_true_state, by = c("emu","year"), suffix(".iter",".true"))  |>
+  filter(emu == "FR_Loir") 
+  
