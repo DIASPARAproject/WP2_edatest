@@ -18,10 +18,6 @@ network <- rn_rna %>%
            !is.na(lddws) & !is.na(hydraulicdensityperm2.) & !is.na(dist_from_gibraltar_km)) %>%
   select(-all_of(c("gamma","delta","density")))
 rm("rn_rna")
-ddd <- ddd %>%
-  filter(startsWith(as.character(emu), "FR") & year >=1990 &
-           !as.character(emu) %in% c("FR_Rhin", "FR_Meus"))
-
 
 library(ggplot2)
 library(dplyr)
@@ -33,7 +29,17 @@ ddd |>
   geom_tile() + 
   theme_bw() +
   xlab("") + ylab("EMU") +
-  scale_fill_viridis_d("number")
+  scale_fill_viridis_d("number of operations") +
+  xlim(1990, 2018)
+
+ggsave("nb_elecrofishing.png", dpi = 300, width = 16 / 2.54, height = 16/2.54)
+
+ddd <- ddd %>%
+  filter(startsWith(as.character(emu), "FR") & year >=1990 &
+           !as.character(emu) %in% c("FR_Rhin", "FR_Meus"))
+
+
+
 
 ddg  <- ddg %>%
   filter(startsWith(as.character(emu), "FR") & year >=1990 &

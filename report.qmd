@@ -110,7 +110,7 @@ library(dplyr)
 
 figure <- ggplot(correlations %>%
                    mutate(f = ifelse(f=="create_sampling_strahler",
-                                     "stratified",
+                                     "strahler",
                                      "random")), 
                  aes(x = as.factor(nb),
                      y = cor,
