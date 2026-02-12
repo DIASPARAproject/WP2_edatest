@@ -74,7 +74,9 @@ results |>
   facet_grid(emu~nb, scales = "free_y") +
   scale_y_log10() +
   theme_bw() +
-  xlab("")
+  xlab("") + 
+  ylab("Abundance") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 ggsave("trends.png", width = 16/2.54, height = 16/2.54, dpi = 300)
 
 save(correlations, file = "eda_simulate2.rdata")
